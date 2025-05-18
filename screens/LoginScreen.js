@@ -27,6 +27,11 @@ const LoginScreen = () => {
         secureTextEntry
       />
       <CustomButton title="Войти" onPress={handleLogin} />
+      <CustomButton
+        title="Зарегистрироваться"
+        onPress={() => alert('Переход к регистрации')}
+        variant="secondary"
+      />
     </View>
   );
 };
