@@ -1,18 +1,41 @@
 import React, { useState } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
+import RegistrationScreen from './screens/RegistrationScreen';
+
+const Stack = createStackNavigator();
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
 
-  return isLoggedIn ? (
-    <HomeScreen username={username} />
-  ) : (
-    <LoginScreen onLoginSuccess={(user) => {
-      setUsername(user);
-      setIsLoggedIn(true);
-    }} />
+  return (
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isLoggedIn ? (
+          <Stack.Screen name="Home">
+            {() => <HomeScreen username={username} />}
+          </Stack.Screen>
+        ) : (
+          <>
+            <Stack.Screen name="Login">
+              {({ navigation }) => (
+                <LoginScreen
+                  onLoginSuccess={(user) => {
+                    setUsername(user);
+                    setIsLoggedIn(true);
+                  }}
+                  navigation={navigation}
+                />
+              )}
+            </Stack.Screen>
+            <Stack.Screen name="Registration" component={RegistrationScreen} />
+          </>
+        )}
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 

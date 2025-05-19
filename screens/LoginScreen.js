@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 
-const LoginScreen = ({ onLoginSuccess }) => {
+const LoginScreen = ({ onLoginSuccess, navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -77,7 +77,7 @@ const LoginScreen = ({ onLoginSuccess }) => {
       <CustomButton title="Войти" onPress={handleLogin} />
       <CustomButton
         title="Зарегистрироваться"
-        onPress={handleRegister}
+        onPress={() => navigation.navigate('Registration')}
         variant="secondary"
       />
     </View>
