@@ -9,7 +9,7 @@ const Search = () => (
       <TextInput style={styles.searchInput} placeholder="Поиск" />
     </View>
     <TouchableOpacity style={styles.filterButton}>
-      <Icon name="filter-list" size={24} color="#1976d2" />
+      <Icon name="tune" size={24} color="#6474b6" />
     </TouchableOpacity>
   </View>
 );

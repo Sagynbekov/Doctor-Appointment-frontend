@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Image, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const HomeHeader = ({ username }) => (
@@ -9,7 +8,7 @@ const HomeHeader = ({ username }) => (
       <Text style={styles.hello}>Добро пожаловать, {username}!</Text>
     </View>
     <TouchableOpacity style={styles.iconButton}>
-      <Icon name="notifications-none" size={28} color="#1976d2" />
+      <Icon name="notifications-none" size={28} color="#6474b6" />
     </TouchableOpacity>
   </View>
 );

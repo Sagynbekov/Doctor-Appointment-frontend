@@ -63,9 +63,11 @@ const styles = StyleSheet.create({
     color: '#222',
   },
   doctorService: {
-    color: '#1976d2',
+    color: '#6474b6',
     fontSize: 14,
     marginTop: 2,
+    fontStyle: 'italic',
+    fontWeight: 'bold',
   },
   doctorPrice: {
     color: '#888',

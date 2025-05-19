@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Footer = () => (
   <View style={styles.footer}>
-    <Icon name="home" size={28} color="#1976d2" />
+    <Icon name="home" size={28} color="#6474b6" />
     <Icon name="calendar-today" size={28} color="#aaa" />
     <Icon name="favorite-border" size={28} color="#aaa" />
     <Icon name="person-outline" size={28} color="#aaa" />
@@ -20,7 +20,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#eee',
     marginTop: 10,
-    marginBottom: 24, // добавлен отступ снизу, чтобы футер не мешал системным кнопкам
+    marginBottom: 24,
   },
 });
 
