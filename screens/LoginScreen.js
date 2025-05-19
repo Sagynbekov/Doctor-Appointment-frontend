@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Alert } from 'react-native';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 
-const LoginScreen = () => {
+const LoginScreen = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -23,11 +23,8 @@ const LoginScreen = () => {
         body: JSON.stringify({ username, password }),
       });
       if (response.ok) {
-        // Успешная авторизация
-        Alert.alert('Успех', 'Вы успешно вошли!');
-        // Здесь можно добавить переход на другой экран
+        onLoginSuccess(username);
       } else {
-        // Ошибка авторизации
         setError('Неверный логин или пароль');
       }
     } catch (e) {
