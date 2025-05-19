@@ -20,6 +20,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderColor: '#eee',
     marginTop: 10,
+    marginBottom: 24, // добавлен отступ снизу, чтобы футер не мешал системным кнопкам
   },
 });
 

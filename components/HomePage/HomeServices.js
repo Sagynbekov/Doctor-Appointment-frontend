@@ -8,7 +8,7 @@ const Services = () => (
     <View style={styles.servicesHeader}>
       <Text style={styles.servicesTitle}>Сервисы</Text>
       <TouchableOpacity style={styles.allButton}>
-        <Text style={styles.allButtonText}>Все</Text>
+        <Text style={styles.allButtonText}>Больше</Text>
       </TouchableOpacity>
     </View>
     <View style={styles.servicesRow}>
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
   allButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: 12,
   },
   servicesRow: {
     flexDirection: 'row',
@@ -59,9 +59,9 @@ const styles = StyleSheet.create({
   },
   serviceBox: {
     backgroundColor: '#1976d2',
-    borderRadius: 16,
-    width: 90,
-    height: 90,
+    borderRadius: 20,
+    width: 115,
+    height: 97,
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 4,

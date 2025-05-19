@@ -8,10 +8,12 @@ import Footer from '../components/HomePage/HomeFooter';
 
 const HomeScreen = ({ username }) => (
   <View style={styles.container}>
-    <HomeHeader username={username} />
-    <Search />
-    <Services />
-    <TopDoctors />
+    <View style={{ flex: 1 }}>
+      <HomeHeader username={username} />
+      <Search />
+      <Services />
+      <TopDoctors />
+    </View>
     <Footer />
   </View>
 );
