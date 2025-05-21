@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import DoctorCard from './HomeDoctorCards';
 
 const doctors = [
@@ -17,13 +18,21 @@ const doctors = [
   },
 ];
 
-const TopDoctors = () => (
-  <>
-    <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#222', marginBottom: 20 }}>Лучшие Доктора</Text>
-    {doctors.map((doctor, idx) => (
-      <DoctorCard doctor={doctor} key={idx} />
-    ))}
-  </>
-);
+const TopDoctors = () => {
+  const navigation = useNavigation();
+
+  return (
+    <>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#222', marginBottom: 24 }}>Лучшие Доктора</Text>
+      {doctors.map((doctor, idx) => (
+        <DoctorCard
+          doctor={doctor}
+          key={idx}
+          onPress={() => navigation.navigate('DoctorProfile', { doctor })}
+        />
+      ))}
+    </>
+  );
+};
 
 export default TopDoctors;

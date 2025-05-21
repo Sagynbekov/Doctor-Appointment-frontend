@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './screens/HomeScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegistrationScreen from './screens/RegistrationScreen';
+import DoctorProfile from './screens/DoctorProfile';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,11 @@ export default function App() {
             <Stack.Screen name="Registration" component={RegistrationScreen} />
           </>
         )}
+        <Stack.Screen
+          name="DoctorProfile"
+          component={DoctorProfile}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
