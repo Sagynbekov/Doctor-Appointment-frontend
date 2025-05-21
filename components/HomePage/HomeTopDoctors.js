@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     color: '#222',
   },
   doctorService: {
-    color: '#6474b6',
+    color: '#3E69FE',
     fontSize: 14,
     marginTop: 2,
     fontStyle: 'italic',

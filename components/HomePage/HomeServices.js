@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   allButton: {
-    backgroundColor: '#6474b6',
+    backgroundColor: '#3E69FE',
     borderRadius: 16,
     paddingHorizontal: 18,
     paddingVertical: 6,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   serviceBox: {
-    backgroundColor: '#6474b6',
+    backgroundColor: '#3E69FE',
     borderRadius: 20,
     width: 115,
     height: 97,
