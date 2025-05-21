@@ -9,6 +9,7 @@ const Services = () => (
       <Text style={styles.servicesTitle}>Сервисы</Text>
       <TouchableOpacity style={styles.allButton}>
         <Text style={styles.allButtonText}>Больше</Text>
+        <FontAwesome name="angle-right" size={16} color="#fff" style={{ marginLeft: 5 }} />
       </TouchableOpacity>
     </View>
     <View style={styles.servicesRow}>
@@ -46,6 +47,13 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 18,
     paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.28,
+    shadowRadius: 3,
+    elevation: 4,
   },
   allButtonText: {
     color: '#fff',

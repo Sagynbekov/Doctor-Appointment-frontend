@@ -8,7 +8,7 @@ const HomeHeader = ({ username }) => (
       <Text style={styles.hello}>Добро пожаловать, {username}!</Text>
     </View>
     <TouchableOpacity style={styles.iconButton}>
-      <Icon name="notifications-none" size={28} color="#6474b6" />
+      <Icon name="notifications-none" size={28} color="#3E69FE" />
     </TouchableOpacity>
   </View>
 );
