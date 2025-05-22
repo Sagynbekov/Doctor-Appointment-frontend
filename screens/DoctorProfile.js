@@ -2,6 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, Image, Dimensions, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import DoctorInfo from '../components/DoctorProfilePage/doctorInfo';
 
 const DoctorProfile = () => {
   const navigation = useNavigation();
@@ -31,17 +32,7 @@ const DoctorProfile = () => {
             <FontAwesome name="heart-o" size={23} color="#FF3B30" />
           </TouchableOpacity>
         </View>
-        <View style={styles.infoRow}>
-          <View style={styles.infoBox}>
-            <Text style={styles.doctorName}>{doctor?.name}</Text>
-            <Text style={styles.doctorService}>{doctor?.service}</Text>
-          </View>
-          <View style={styles.ratingBox}>
-            <FontAwesome name="star" size={16} color="#FFD600" />
-            <Text style={styles.ratingValue}>4.5</Text>
-            <Text style={styles.ratingReviews}>(76 отзывов)</Text>
-          </View>
-        </View>
+        <DoctorInfo doctor={doctor} />
       </View>
     </View>
   );
@@ -84,14 +75,13 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     width: '85%',
     marginTop: 15,
     paddingLeft: 8,
     paddingRight: 8,
   },
   photoContainer: {
-    // width и height задаются динамически
   },
   photo: {
     borderRadius: 24,
@@ -131,8 +121,8 @@ const styles = StyleSheet.create({
   },
   ratingBox: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 12,
+    alignItems: 'flex-start', // изменено с 'center' на 'flex-start'
+    marginTop: 2, // можно добавить небольшой отступ сверху
   },
   ratingValue: {
     color: '#222',
