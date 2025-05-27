@@ -1,30 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TextInput, Alert, TouchableOpacity } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import InputField from '../components/InputField';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const initialSpecs = [
-  { id: 1, name: 'Стоматология', description: 'Лечение и профилактика заболеваний зубов.' },
-  { id: 2, name: 'Кардиология', description: 'Диагностика и лечение сердечно-сосудистых заболеваний.' },
-];
+const API_URL = 'http://192.168.0.105:8080';
 
 const AdminSpecScreen = () => {
-  const [specs, setSpecs] = useState(initialSpecs);
+  const [specs, setSpecs] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleAddSpec = () => {
+  useEffect(() => {
+    fetch(`${API_URL}/specializations`)
+      .then(res => res.json())
+      .then(data => setSpecs(data))
+      .catch(() => setSpecs([]));
+  }, []);
+
+  const handleAddSpec = async () => {
     if (!name || !description) {
       Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
-    setSpecs([
-      ...specs,
-      { id: Date.now(), name, description },
-    ]);
-    setName('');
-    setDescription('');
+    try {
+      const response = await fetch(`${API_URL}/specializations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description }),
+      });
+      if (response.ok) {
+        const newSpec = await response.json();
+        setSpecs([...specs, newSpec]);
+        setName('');
+        setDescription('');
+      } else {
+        Alert.alert('Ошибка', 'Не удалось добавить специализацию');
+      }
+    } catch {
+      Alert.alert('Ошибка', 'Ошибка соединения с сервером');
+    }
   };
 
   const handleDeleteSpec = (id) => {

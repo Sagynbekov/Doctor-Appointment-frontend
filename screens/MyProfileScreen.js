@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, ActivityIndicator, Alert } from 'react-n
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import CustomButton from '../components/CustomButton';
 
-const API_URL = 'http://192.168.0.115:8080'; // поменяйте на ваш актуальный IP
+const API_URL = 'http://192.168.0.105:8080'; // поменяйте на ваш актуальный IP
 
 const MyProfileScreen = ({ username, onLogout }) => {
   const [user, setUser] = useState(null);

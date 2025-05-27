@@ -1,59 +1,92 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
 import CustomButton from '../components/CustomButton';
 import InputField from '../components/InputField';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Picker } from '@react-native-picker/picker';
+import * as ImagePicker from 'expo-image-picker';
 
 const defaultAvatar = require('../assets/icon.png');
-
-const initialDoctors = [
-  {
-    id: 1,
-    name: 'Dr. Иван Иванов',
-    service: 'Стоматология',
-    price: '5000₸',
-    about: 'Опытный стоматолог с индивидуальным подходом.',
-    avatar: defaultAvatar,
-  },
-  {
-    id: 2,
-    name: 'Dr. Ольга Петрова',
-    service: 'Кардиология',
-    price: '7000₸',
-    about: 'Кардиолог с большим опытом работы.',
-    avatar: defaultAvatar,
-  },
-];
+const API_URL = 'http://192.168.0.105:8080';
 
 const AdminScreen = () => {
-  const [doctors, setDoctors] = useState(initialDoctors);
+  const [doctors, setDoctors] = useState([]);
   const [name, setName] = useState('');
   const [service, setService] = useState('');
   const [price, setPrice] = useState('');
   const [about, setAbout] = useState('');
   const [avatar, setAvatar] = useState(defaultAvatar);
+  const [specializations, setSpecializations] = useState([]);
+  const [selectedSpecId, setSelectedSpecId] = useState('');
+  const [photoUrl, setPhotoUrl] = useState('');
 
-  const handleAddDoctor = () => {
-    if (!name || !service || !price || !about) {
+  useEffect(() => {
+    fetch(`${API_URL}/doctors`)
+      .then(res => res.json())
+      .then(data => setDoctors(data))
+      .catch(() => setDoctors([]));
+  }, []);
+
+  useEffect(() => {
+    fetch(`${API_URL}/specializations`)
+      .then(res => res.json())
+      .then(data => setSpecializations(data))
+      .catch(() => setSpecializations([]));
+  }, []);
+
+  const handlePickImage = async () => {
+    // Запросить разрешение на доступ к галерее
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Ошибка', 'Разрешение на доступ к галерее не получено');
+      return;
+    }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType.IMAGE,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+      base64: true,
+    });
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setPhotoUrl('data:image/jpeg;base64,' + result.assets[0].base64);
+    }
+  };
+
+  const handleAddDoctor = async () => {
+    if (!name || !selectedSpecId || !price || !about) {
       Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
-    setDoctors([
-      ...doctors,
-      {
-        id: Date.now(),
-        name,
-        service,
-        price: price.endsWith('₸') ? price : price + '₸',
-        about,
-        avatar,
-      },
-    ]);
-    setName('');
-    setService('');
-    setPrice('');
-    setAbout('');
-    setAvatar(defaultAvatar);
+    try {
+      const response = await fetch(`${API_URL}/doctors`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          specialization: { id: Number(selectedSpecId) },
+          price: price.endsWith('₸') ? price : price + '₸',
+          about,
+          photoUrl,
+        }),
+      });
+      if (response.ok) {
+        // После успешного добавления доктора обновляем список с сервера
+        fetch(`${API_URL}/doctors`)
+          .then(res => res.json())
+          .then(data => setDoctors(data));
+        setName('');
+        setSelectedSpecId('');
+        setPrice('');
+        setAbout('');
+        setPhotoUrl('');
+        setAvatar(defaultAvatar);
+      } else {
+        Alert.alert('Ошибка', 'Не удалось добавить доктора');
+      }
+    } catch {
+      Alert.alert('Ошибка', 'Ошибка соединения с сервером');
+    }
   };
 
   const handleDeleteDoctor = (id) => {
@@ -67,12 +100,11 @@ const AdminScreen = () => {
 
   const renderDoctor = ({ item }) => (
     <View style={styles.card}>
-      <Image source={item.avatar} style={styles.avatar} />
+      <Image source={item.photoUrl ? { uri: item.photoUrl } : defaultAvatar} style={styles.avatar} />
       <View style={{ flex: 1 }}>
         <Text style={styles.doctorName}>{item.name}</Text>
-        <Text style={styles.doctorService}>{item.service}</Text>
+        <Text style={styles.doctorService}>{item.specialization?.name || ''}</Text>
         <Text style={styles.doctorPrice}>Цена: {item.price}</Text>
-        <Text style={styles.doctorAbout}>{item.about}</Text>
         <View style={styles.iconRow}>
           <TouchableOpacity style={styles.scheduleButton} onPress={() => Alert.alert('Расписание', 'Здесь будет управление расписанием доктора.')}> 
             <Text style={styles.scheduleButtonText}>График</Text>
@@ -96,7 +128,18 @@ const AdminScreen = () => {
             <Text style={styles.title}>Панель Администратора</Text>
             <Text style={styles.sectionTitle}>Добавить нового доктора</Text>
             <InputField placeholder="Имя доктора" value={name} onChangeText={setName} />
-            <InputField placeholder="Специализация" value={service} onChangeText={setService} />
+            <View style={{ marginVertical: 8, backgroundColor: '#f9f9f9', borderRadius: 8, borderWidth: 1, borderColor: '#ccc' }}>
+              <Picker
+                selectedValue={selectedSpecId}
+                onValueChange={value => setSelectedSpecId(value)}
+                style={{ height: 50, width: '100%' }}
+              >
+                <Picker.Item label="Выберите специализацию" value="" />
+                {specializations.map(spec => (
+                  <Picker.Item key={spec.id} label={spec.name} value={spec.id.toString()} />
+                ))}
+              </Picker>
+            </View>
             <InputField placeholder="Цена (₸)" value={price} onChangeText={setPrice} keyboardType="numeric" />
             <TextInput
               style={styles.textArea}
@@ -106,6 +149,16 @@ const AdminScreen = () => {
               multiline
               numberOfLines={3}
             />
+            {/* Центрированная кнопка для загрузки фото с подписью */}
+            <View style={{ alignItems: 'center', marginVertical: 8 }}>
+              <TouchableOpacity onPress={handlePickImage} style={styles.photoIconButtonCentered}>
+                <FontAwesome name="camera" size={32} color="#1976d2" />
+              </TouchableOpacity>
+              <Text style={{ color: '#1976d2', marginTop: 4, fontWeight: 'bold' }}>Добавить фото</Text>
+              {photoUrl ? (
+                <Image source={{ uri: photoUrl }} style={{ width: 80, height: 80, borderRadius: 40, marginTop: 8 }} />
+              ) : null}
+            </View>
             <CustomButton title="Добавить доктора" onPress={handleAddDoctor} />
             <Text style={styles.sectionTitle}>Список докторов</Text>
           </>
@@ -175,12 +228,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 2,
   },
-  doctorAbout: {
-    color: '#444',
-    fontSize: 13,
-    marginTop: 4,
-    marginBottom: 6,
-  },
   scheduleButton: {
     backgroundColor: '#1976d2',
     borderRadius: 8,
@@ -202,6 +249,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     marginVertical: 8,
     minHeight: 60,
+  },
+  photoIconButtonCentered: {
+    alignSelf: 'center',
+    marginTop: -8,
+    marginBottom: 8,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#f3f6fa',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#1976d2',
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   iconRow: {
     flexDirection: 'row',

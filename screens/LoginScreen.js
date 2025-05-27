@@ -8,7 +8,7 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const API_URL = 'http://192.168.0.115:8080'; // IP вашего ПК в локальной сети, ИЗМЕНЕН ПОРТ НА 8080
+  const API_URL = 'http://192.168.0.105:8080'; // IP вашего ПК в локальной сети, ИЗМЕНЕН ПОРТ НА 8080
 
   const handleLogin = async () => {
     setError('');
