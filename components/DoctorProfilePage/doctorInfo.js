@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DoctorStats from './doctorStats';
 
-const DoctorInfo = ({ doctor }) => (
+const DoctorInfo = ({ doctor, onBook }) => (
   <View>
     <View style={styles.infoRow}>
       <View style={styles.infoBox}>
@@ -25,7 +25,7 @@ const DoctorInfo = ({ doctor }) => (
       </Text>
     </View>
     {/* Кнопка "Записаться" */}
-    <TouchableOpacity style={styles.button}>
+    <TouchableOpacity style={styles.button} onPress={onBook}>
       <Text style={styles.buttonText}>Записаться</Text>
     </TouchableOpacity>
   </View>

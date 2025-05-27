@@ -32,7 +32,7 @@ const DoctorProfile = () => {
             <FontAwesome name="heart-o" size={23} color="#FF3B30" />
           </TouchableOpacity>
         </View>
-        <DoctorInfo doctor={doctor} />
+        <DoctorInfo doctor={doctor} onBook={() => navigation.navigate('BookingScreen', { doctor })} />
       </View>
     </View>
   );
