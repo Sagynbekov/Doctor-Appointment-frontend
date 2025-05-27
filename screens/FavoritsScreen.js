@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import DoctorCard from '../components/HomePage/HomeDoctorCards';
@@ -14,29 +14,36 @@ const FavoritsScreen = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  useEffect(() => {
-    const fetchFavorits = async () => {
-      try {
-        const uid = await AsyncStorage.getItem('userId');
-        if (!uid) {
-          setDoctors([]);
-          setLoading(false);
-          return;
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+      const fetchFavorits = async () => {
+        try {
+          const uid = await AsyncStorage.getItem('userId');
+          if (!uid) {
+            if (isActive) {
+              setDoctors([]);
+              setLoading(false);
+            }
+            return;
+          }
+          const response = await fetch(`${API_URL}/api/favorits?userId=${uid}`);
+          const data = await response.json();
+          if (isActive) setDoctors(data.map(doc => ({
+            ...doc,
+            avatar: doc.photoUrl ? { uri: doc.photoUrl } : DEFAULT_AVATAR,
+          })));
+        } catch {
+          if (isActive) setDoctors([]);
+        } finally {
+          if (isActive) setLoading(false);
         }
-        const response = await fetch(`${API_URL}/api/favorits?userId=${uid}`);
-        const data = await response.json();
-        setDoctors(data.map(doc => ({
-          ...doc,
-          avatar: doc.photoUrl ? { uri: doc.photoUrl } : DEFAULT_AVATAR,
-        })));
-      } catch {
-        setDoctors([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchFavorits();
-  }, []);
+      };
+      setLoading(true);
+      fetchFavorits();
+      return () => { isActive = false; };
+    }, [])
+  );
 
   const renderItem = ({ item }) => (
     <DoctorCard

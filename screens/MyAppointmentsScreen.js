@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ReviewsModal from '../components/MyAppointmentsPage/ReviewsModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 const DEFAULT_AVATAR = require('../assets/icon.png');
 const API_URL = 'http://192.168.0.105:8080'; // используем тот же адрес, что и на других страницах
@@ -14,38 +15,43 @@ const MyAppointmentsScreen = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        // Получаем userId из AsyncStorage
-        const storedUserId = await AsyncStorage.getItem('userId');
-        if (!storedUserId) {
-          setAppointments([]);
-          setLoading(false);
-          return;
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+      const fetchAppointments = async () => {
+        try {
+          const storedUserId = await AsyncStorage.getItem('userId');
+          if (!storedUserId) {
+            if (isActive) {
+              setAppointments([]);
+              setLoading(false);
+            }
+            return;
+          }
+          const userId = Number(storedUserId);
+          const response = await fetch(`${API_URL}/api/books/appointments?userId=${userId}`);
+          const data = await response.json();
+          const formatted = data.map(item => ({
+            id: String(item.id),
+            doctor: item.doctorName,
+            service: item.service,
+            date: item.date,
+            time: item.time,
+            avatar: item.photoUrl ? { uri: item.photoUrl } : DEFAULT_AVATAR,
+            doctorId: item.doctorId,
+          }));
+          if (isActive) setAppointments(formatted);
+        } catch (e) {
+          if (isActive) setAppointments([]);
+        } finally {
+          if (isActive) setLoading(false);
         }
-        const userId = Number(storedUserId);
-        const response = await fetch(`${API_URL}/api/books/appointments?userId=${userId}`);
-        const data = await response.json();
-        // Преобразуем данные для FlatList
-        const formatted = data.map(item => ({
-          id: String(item.id),
-          doctor: item.doctorName,
-          service: item.service,
-          date: item.date,
-          time: item.time,
-          avatar: item.photoUrl ? { uri: item.photoUrl } : DEFAULT_AVATAR,
-          doctorId: item.doctorId, // добавляем doctorId для отзыва
-        }));
-        setAppointments(formatted);
-      } catch (e) {
-        setAppointments([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAppointments();
-  }, []);
+      };
+      setLoading(true);
+      fetchAppointments();
+      return () => { isActive = false; };
+    }, [])
+  );
 
   const handleOpenReview = (appointment) => {
     setSelectedDoctor(appointment.doctor);
