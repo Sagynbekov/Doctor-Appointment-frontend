@@ -7,10 +7,6 @@ const Services = () => (
   <>
     <View style={styles.servicesHeader}>
       <Text style={styles.servicesTitle}>Сервисы</Text>
-      <TouchableOpacity style={styles.allButton}>
-        <Text style={styles.allButtonText}>Больше</Text>
-        <FontAwesome name="angle-right" size={16} color="#fff" style={{ marginLeft: 5 }} />
-      </TouchableOpacity>
     </View>
     <View style={styles.servicesRow}>
       <View style={styles.serviceBox}>

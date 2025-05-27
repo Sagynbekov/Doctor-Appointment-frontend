@@ -5,47 +5,65 @@ const doctorAvailableDate = ({
   days,
   selectedDate,
   setSelectedDate,
-  mockTimes,
+  allTimes,
   selectedTime,
   setSelectedTime,
-  onConfirm
+  onConfirm,
+  busyTimes = [],
+  allBusyTimes = {}
 }) => (
   <>
     <View style={styles.calendarBlock}>
       <Text style={styles.sectionTitle}>Выберите дату</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.calendarScroll}>
-        {days.map((day) => (
-          <TouchableOpacity
-            key={day.value}
-            style={[styles.dayButton, selectedDate === day.value && styles.dayButtonSelected]}
-            onPress={() => setSelectedDate(day.value)}
-          >
-            <Text style={[styles.dayLabel, selectedDate === day.value && styles.dayLabelSelected]}>{day.label}</Text>
-          </TouchableOpacity>
-        ))}
+        {days.map((day) => {
+          const dayBusyTimes = allBusyTimes[day.value] || [];
+          const isFullBusy = allTimes && dayBusyTimes && allTimes.every(time => dayBusyTimes.includes(time));
+          const isSelected = selectedDate === day.value;
+          return (
+            <TouchableOpacity
+              key={day.value}
+              style={[
+                styles.dayButton,
+                isSelected && styles.dayButtonSelected,
+                isFullBusy && styles.dayButtonFullBusy,
+              ]}
+              onPress={() => setSelectedDate(day.value)}
+            >
+              <Text style={[
+                styles.dayLabel,
+                isSelected && styles.dayLabelSelected,
+                isFullBusy && styles.dayLabelFullBusy,
+              ]}>{day.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
     </View>
     <View style={styles.timeBlock}>
       <Text style={styles.sectionTitle}>Свободное время</Text>
       <View style={styles.timeRow}>
-        {mockTimes.map((slot) => (
-          <TouchableOpacity
-            key={slot.time}
-            style={[
-              styles.timeButton,
-              !slot.available && styles.timeButtonDisabled,
-              selectedTime === slot.time && slot.available && styles.timeButtonSelected,
-            ]}
-            disabled={!slot.available}
-            onPress={() => setSelectedTime(slot.time)}
-          >
-            <Text style={[
-              styles.timeLabel,
-              !slot.available && styles.timeLabelDisabled,
-              selectedTime === slot.time && slot.available && styles.timeLabelSelected,
-            ]}>{slot.time}</Text>
-          </TouchableOpacity>
-        ))}
+        {allTimes.map((time) => {
+          const isBusy = busyTimes.includes(time);
+          return (
+            <TouchableOpacity
+              key={time}
+              style={[
+                styles.timeButton,
+                isBusy && styles.timeButtonDisabled,
+                selectedTime === time && !isBusy && styles.timeButtonSelected,
+              ]}
+              disabled={isBusy}
+              onPress={() => setSelectedTime(time)}
+            >
+              <Text style={[
+                styles.timeLabel,
+                isBusy && styles.timeLabelDisabled,
+                selectedTime === time && !isBusy && styles.timeLabelSelected,
+              ]}>{time}</Text>
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
     <TouchableOpacity
@@ -82,12 +100,21 @@ const styles = StyleSheet.create({
   dayButtonSelected: {
     backgroundColor: '#4F6CFF',
   },
+  dayButtonFullBusy: {
+    backgroundColor: '#ffb3b3', // светло-красный
+    borderWidth: 1,
+    borderColor: '#ff3333',
+  },
   dayLabel: {
     color: '#222',
     fontSize: 15,
   },
   dayLabelSelected: {
     color: '#fff',
+    fontWeight: 'bold',
+  },
+  dayLabelFullBusy: {
+    color: '#ff3333',
     fontWeight: 'bold',
   },
   timeBlock: {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ onLoginSuccess, navigation }) => {
   const [username, setUsername] = useState('');
@@ -14,7 +15,7 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
     setError('');
     // Хардкод для админа
     if (username === 'Admin' && password === '123') {
-      onLoginSuccess('Admin', true); // второй аргумент - это isAdmin
+      onLoginSuccess('Admin', true);
       return;
     }
     try {
@@ -26,6 +27,12 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
         body: JSON.stringify({ username, password }),
       });
       if (response.ok) {
+        // Получаем userId и сохраняем в AsyncStorage
+        const userRes = await fetch(`${API_URL}/user?username=${username}`);
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          await AsyncStorage.setItem('userId', String(userData.id));
+        }
         onLoginSuccess(username, false);
       } else {
         setError('Неверный логин или пароль');

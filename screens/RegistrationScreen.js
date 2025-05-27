@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegistrationScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -34,6 +35,12 @@ const RegistrationScreen = ({ navigation }) => {
         }),
       });
       if (response.ok) {
+        // Получаем userId и сохраняем в AsyncStorage
+        const userRes = await fetch(`${API_URL}/user?username=${username}`);
+        if (userRes.ok) {
+          const userData = await userRes.json();
+          await AsyncStorage.setItem('userId', String(userData.id));
+        }
         setSuccess('Регистрация успешна!');
         setTimeout(() => navigation.goBack(), 1500);
       } else if (response.status === 409) {
