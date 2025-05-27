@@ -92,7 +92,7 @@ const AdminScreen = () => {
             name,
             service,
             specialization: { id: Number(selectedSpecId) },
-            price: price.endsWith('₸') ? price : price + '₸',
+            price, // убрано добавление '₸'
             about,
             photoUrl,
           }),
@@ -119,7 +119,7 @@ const AdminScreen = () => {
             name,
             service,
             specialization: { id: Number(selectedSpecId) },
-            price: price.endsWith('₸') ? price : price + '₸',
+            price, // убрано добавление '₸'
             about,
             photoUrl,
           }),
@@ -171,7 +171,7 @@ const AdminScreen = () => {
     setName(doctor.name);
     setService(doctor.service);
     setSelectedSpecId(doctor.specialization?.id?.toString() || '');
-    setPrice(doctor.price ? doctor.price.replace(/₸$/, '') : '');
+    setPrice(doctor.price ? doctor.price : ''); // убрано удаление '₸'
     setAbout(doctor.about);
     setPhotoUrl(doctor.photoUrl || '');
     setAvatar(doctor.photoUrl ? { uri: doctor.photoUrl } : defaultAvatar);
@@ -184,7 +184,7 @@ const AdminScreen = () => {
         <Text style={styles.doctorName}>{item.name}</Text>
         <Text style={styles.doctorService}>{item.service || ''}</Text>
         <Text style={styles.doctorService}>{item.specialization?.name || ''}</Text>
-        <Text style={styles.doctorPrice}>Цена: {item.price}</Text>
+        <Text style={styles.doctorPrice}>{item.price}</Text>
         <View style={styles.iconRow}>
           <TouchableOpacity style={styles.scheduleButton} onPress={() => Alert.alert('Расписание', 'Здесь будет управление расписанием доктора.')}> 
             <Text style={styles.scheduleButtonText}>График</Text>
@@ -232,7 +232,7 @@ const AdminScreen = () => {
                 ))}
               </Picker>
             </View>
-            <InputField placeholder="Цена (₸)" value={price} onChangeText={setPrice} keyboardType="numeric" />
+            <InputField placeholder="Цена" value={price} onChangeText={setPrice} keyboardType="numeric" />
             <TextInput
               style={styles.textArea}
               placeholder="Обо мне"
