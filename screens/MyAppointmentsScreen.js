@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import ReviewsModal from '../components/MyAppointmentsPage/ReviewsModal';
 
 const DEFAULT_AVATAR = require('../assets/icon.png');
 const API_URL = 'http://192.168.0.105:8080'; // используем тот же адрес, что и на других страницах
@@ -8,6 +9,9 @@ const API_URL = 'http://192.168.0.105:8080'; // используем тот же
 const MyAppointmentsScreen = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   // TODO: заменить userId на реальный id авторизованного пользователя
   const userId = 1;
@@ -36,6 +40,40 @@ const MyAppointmentsScreen = () => {
     fetchAppointments();
   }, []);
 
+  const handleOpenReview = (appointment) => {
+    setSelectedDoctor(appointment.doctor);
+    setSelectedAppointment(appointment);
+    setModalVisible(true);
+  };
+
+  const handleCloseReview = () => {
+    setModalVisible(false);
+    setSelectedDoctor(null);
+    setSelectedAppointment(null);
+  };
+
+  const handleSubmitReview = async (reviewData) => {
+    if (!selectedAppointment) return;
+    try {
+      const response = await fetch(`${API_URL}/api/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          doctorId: selectedAppointment.doctorId || selectedAppointment.id, // doctorId или id (если doctorId нет)
+          userId: userId,
+          text: reviewData.review,
+          stars: reviewData.rating,
+        }),
+      });
+      if (!response.ok) {
+        alert('Ошибка при отправке отзыва');
+      }
+    } catch (e) {
+      alert('Ошибка соединения с сервером');
+    }
+    handleCloseReview();
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <Image source={item.avatar} style={styles.avatar} />
@@ -44,7 +82,13 @@ const MyAppointmentsScreen = () => {
         <Text style={styles.service}>{item.service}</Text>
         <Text style={styles.dateTime}>{item.date} в {item.time}</Text>
       </View>
-      <FontAwesome name="calendar-check-o" size={28} color="#4F6CFF" style={{ marginLeft: 10 }} />
+      <FontAwesome
+        name="calendar-check-o"
+        size={28}
+        color="#4F6CFF"
+        style={{ marginLeft: 10 }}
+        onPress={() => handleOpenReview(item)}
+      />
     </View>
   );
 
@@ -63,6 +107,12 @@ const MyAppointmentsScreen = () => {
           contentContainerStyle={{ paddingBottom: 24 }}
         />
       )}
+      <ReviewsModal
+        visible={modalVisible}
+        onClose={handleCloseReview}
+        onSubmit={handleSubmitReview}
+        doctorName={selectedDoctor}
+      />
     </View>
   );
 };

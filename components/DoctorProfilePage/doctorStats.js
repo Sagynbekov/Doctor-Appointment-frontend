@@ -1,32 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import DoctorReviewsModal from './DoctorReviewsModal';
 
-const DoctorStats = () => (
-  <View style={styles.statsRow}>
-    <View style={styles.statBox}>
-      <View style={styles.iconCircle}>
-        <FontAwesome name="check-square-o" size={24} color="#4F6CFF" />
+const DoctorStats = ({ doctorId }) => {
+  const [reviewsVisible, setReviewsVisible] = useState(false);
+
+  return (
+    <View style={styles.statsRow}>
+      <View style={styles.statBox}>
+        <View style={styles.iconCircle}>
+          <FontAwesome name="check-square-o" size={24} color="#4F6CFF" />
+        </View>
+        <Text style={styles.statValue}>100+</Text>
+        <Text style={styles.statLabel}>Клиентов</Text>
       </View>
-      <Text style={styles.statValue}>100+</Text>
-      <Text style={styles.statLabel}>Клиентов</Text>
-    </View>
-    <View style={styles.statBox}>
-      <View style={styles.iconCircle}>
-        <FontAwesome name="star" size={24} color="#4F6CFF" />
+      <View style={styles.statBox}>
+        <View style={styles.iconCircle}>
+          <FontAwesome name="star" size={24} color="#4F6CFF" />
+        </View>
+        <Text style={styles.statValue}>4.9</Text>
+        <Text style={styles.statLabel}>Рейтинг</Text>
       </View>
-      <Text style={styles.statValue}>4.9</Text>
-      <Text style={styles.statLabel}>Рейтинг</Text>
-    </View>
-    <View style={styles.statBox}>
-      <View style={styles.iconCircle}>
-        <FontAwesome name="commenting" size={24} color="#4F6CFF" />
+      <View style={styles.statBox}>
+        <TouchableOpacity onPress={() => setReviewsVisible(true)}>
+          <View style={styles.iconCircle}>
+            <FontAwesome name="commenting" size={24} color="#4F6CFF" />
+          </View>
+        </TouchableOpacity>
+        <Text style={styles.statValue}>90+</Text>
+        <Text style={styles.statLabel}>Отзывов</Text>
       </View>
-      <Text style={styles.statValue}>90+</Text>
-      <Text style={styles.statLabel}>Отзывов</Text>
+      <DoctorReviewsModal
+        visible={reviewsVisible}
+        onClose={() => setReviewsVisible(false)}
+        doctorId={doctorId}
+      />
     </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   statsRow: {

@@ -16,7 +16,7 @@ const DoctorInfo = ({ doctor, onBook }) => (
         <Text style={styles.ratingReviews}>(76 отзывов)</Text>
       </View>
     </View>
-    <DoctorStats />
+    <DoctorStats doctorId={doctor?.id} />
     {/* Блок "Обо мне" */}
     <View style={styles.aboutContainer}>
       <Text style={styles.aboutTitle}>Обо мне</Text>
