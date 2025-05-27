@@ -29,10 +29,30 @@ const FavoritsScreen = () => {
           }
           const response = await fetch(`${API_URL}/api/favorits?userId=${uid}`);
           const data = await response.json();
-          if (isActive) setDoctors(data.map(doc => ({
+          // Получаем рейтинги для всех докторов
+          const doctorsWithAvatar = data.map(doc => ({
             ...doc,
             avatar: doc.photoUrl ? { uri: doc.photoUrl } : DEFAULT_AVATAR,
-          })));
+          }));
+          // Получаем рейтинги
+          const ratingsObj = {};
+          await Promise.all(
+            doctorsWithAvatar.map(async (doc) => {
+              try {
+                const res = await fetch(`${API_URL}/api/reviews?doctorId=${doc.id}`);
+                const reviews = await res.json();
+                if (Array.isArray(reviews) && reviews.length > 0) {
+                  const avg = reviews.reduce((acc, r) => acc + (r.stars || 0), 0) / reviews.length;
+                  ratingsObj[doc.id] = avg;
+                } else {
+                  ratingsObj[doc.id] = null;
+                }
+              } catch {
+                ratingsObj[doc.id] = null;
+              }
+            })
+          );
+          if (isActive) setDoctors(doctorsWithAvatar.map(doc => ({ ...doc, rating: ratingsObj[doc.id] })));
         } catch {
           if (isActive) setDoctors([]);
         } finally {
@@ -48,6 +68,7 @@ const FavoritsScreen = () => {
   const renderItem = ({ item }) => (
     <DoctorCard
       doctor={item}
+      rating={item.rating}
       onPress={() => navigation.navigate('DoctorProfile', { doctor: item })}
       style={{ marginBottom: 14, width: 320 }}
     />

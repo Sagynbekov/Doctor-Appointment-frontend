@@ -8,11 +8,33 @@ const API_URL = 'http://192.168.0.105:8080';
 const TopDoctors = () => {
   const navigation = useNavigation();
   const [doctors, setDoctors] = useState([]);
+  const [ratings, setRatings] = useState({}); // { [doctorId]: avgRating }
 
   useEffect(() => {
     fetch(`${API_URL}/doctors`)
       .then(res => res.json())
-      .then(data => setDoctors(data))
+      .then(async data => {
+        setDoctors(data);
+        // Получаем рейтинги для всех докторов
+        const ratingsObj = {};
+        await Promise.all(
+          data.map(async (doctor) => {
+            try {
+              const res = await fetch(`${API_URL}/api/reviews?doctorId=${doctor.id}`);
+              const reviews = await res.json();
+              if (Array.isArray(reviews) && reviews.length > 0) {
+                const avg = reviews.reduce((acc, r) => acc + (r.stars || 0), 0) / reviews.length;
+                ratingsObj[doctor.id] = avg;
+              } else {
+                ratingsObj[doctor.id] = null;
+              }
+            } catch {
+              ratingsObj[doctor.id] = null;
+            }
+          })
+        );
+        setRatings(ratingsObj);
+      })
       .catch(() => setDoctors([]));
   }, []);
 
@@ -28,6 +50,7 @@ const TopDoctors = () => {
             price: `Цена: ${doctor.price}`,
             avatar: doctor.photoUrl ? { uri: doctor.photoUrl } : require('../../assets/icon.png'),
           }}
+          rating={ratings[doctor.id]}
           key={doctor.id || idx}
           onPress={() => navigation.navigate('DoctorProfile', { doctor: {
             ...doctor,

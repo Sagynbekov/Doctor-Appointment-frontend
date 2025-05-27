@@ -3,11 +3,13 @@ import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 
-const DoctorCard = ({ doctor, style, onPress }) => (
+const DoctorCard = ({ doctor, style, onPress, rating }) => (
   <TouchableOpacity activeOpacity={0.85} onPress={onPress} style={[styles.doctorCard, style]}>
     <View style={styles.ratingContainer}>
       <FontAwesome name="star" size={16} color="#FFD600" />
-      <Text style={styles.ratingText}>4.5</Text>
+      <Text style={styles.ratingText}>{
+        rating !== undefined && rating !== null ? rating.toFixed(1) : '-'
+      }</Text>
     </View>
     <Image source={doctor.avatar} style={styles.doctorAvatar} />
     <View style={{ flex: 1 }}>
