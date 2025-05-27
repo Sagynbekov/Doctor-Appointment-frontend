@@ -1,14 +1,60 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, TouchableOpacity, Text, Image, Dimensions, StyleSheet } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import DoctorInfo from '../components/DoctorProfilePage/doctorInfo';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const API_URL = 'http://192.168.0.105:8080';
 
 const DoctorProfile = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const doctor = route.params?.doctor;
   const screenWidth = Dimensions.get('window').width;
+  const [isFavorit, setIsFavorit] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const checkFavorit = async () => {
+      const uid = await AsyncStorage.getItem('userId');
+      setUserId(uid);
+      if (!uid || !doctor?.id) return;
+      try {
+        const res = await fetch(`${API_URL}/api/favorits?userId=${uid}`);
+        const favs = await res.json();
+        setIsFavorit(favs.some(d => d.id === doctor.id));
+      } catch {
+        setIsFavorit(false);
+      }
+    };
+    checkFavorit();
+  }, [doctor?.id]);
+
+  const handleToggleFavorit = async () => {
+    if (!userId || !doctor?.id) return;
+    setLoading(true);
+    try {
+      if (!isFavorit) {
+        // Добавить в избранное
+        await fetch(`${API_URL}/api/favorits`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: Number(userId), doctorId: doctor.id }),
+        });
+        setIsFavorit(true);
+      } else {
+        // Удалить из избранного
+        await fetch(`${API_URL}/api/favorits?userId=${userId}&doctorId=${doctor.id}`, {
+          method: 'DELETE',
+        });
+        setIsFavorit(false);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -28,8 +74,8 @@ const DoctorProfile = () => {
             style={[styles.photo, { width: screenWidth * 0.85, height: screenWidth * 0.7 }]}
             resizeMode="cover"
           />
-          <TouchableOpacity style={styles.favoriteButton}>
-            <FontAwesome name="heart-o" size={23} color="#FF3B30" />
+          <TouchableOpacity style={styles.favoriteButton} onPress={handleToggleFavorit} disabled={loading}>
+            <FontAwesome name={isFavorit ? 'heart' : 'heart-o'} size={23} color="#FF3B30" />
           </TouchableOpacity>
         </View>
       </View>
