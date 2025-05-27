@@ -19,7 +19,7 @@ const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const AdminTab = createBottomTabNavigator();
 
-function MainTabs({ username }) {
+function MainTabs({ username, onLogout }) {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -44,7 +44,7 @@ function MainTabs({ username }) {
       <Tab.Screen name="ProfileTab">
         {() => {
           const ProfileScreen = require('./screens/MyProfileScreen').default;
-          return <ProfileScreen username={username} />;
+          return <ProfileScreen username={username} onLogout={onLogout} />;
         }}
       </Tab.Screen>
     </Tab.Navigator>
@@ -112,7 +112,11 @@ export default function App() {
             </Stack.Screen>
           ) : (
             <Stack.Screen name="MainTabs">
-              {() => <MainTabs username={username} />}
+              {() => <MainTabs username={username} onLogout={() => {
+                setIsLoggedIn(false);
+                setUsername('');
+                setIsAdmin(false);
+              }} />}
             </Stack.Screen>
           )
         ) : (

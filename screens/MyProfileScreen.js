@@ -5,7 +5,7 @@ import CustomButton from '../components/CustomButton';
 
 const API_URL = 'http://192.168.0.115:8080'; // поменяйте на ваш актуальный IP
 
-const MyProfileScreen = ({ username }) => {
+const MyProfileScreen = ({ username, onLogout }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -28,7 +28,9 @@ const MyProfileScreen = ({ username }) => {
   const handleLogout = () => {
     Alert.alert('Выход', 'Вы уверены, что хотите выйти?', [
       { text: 'Отмена', style: 'cancel' },
-      { text: 'Выйти', style: 'destructive', onPress: () => { /* реализуйте выход */ } },
+      { text: 'Выйти', style: 'destructive', onPress: () => {
+        if (onLogout) onLogout();
+      } },
     ]);
   };
 
