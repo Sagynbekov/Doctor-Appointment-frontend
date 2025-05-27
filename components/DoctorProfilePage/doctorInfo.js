@@ -1,33 +1,37 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import DoctorStats from './doctorStats';
 
-const DoctorInfo = ({ doctor, onBook }) => (
-  <View>
-    <View style={styles.infoRow}>
-      <View style={styles.infoBox}>
-        <Text style={styles.doctorName}>{doctor?.name}</Text>
-        <Text style={styles.doctorService}>{doctor?.service}</Text>
+const DoctorInfo = ({ doctor, onBook }) => {
+  const [reviewsCount, setReviewsCount] = useState(0);
+  const [averageStars, setAverageStars] = useState(0);
+  return (
+    <View>
+      <View style={styles.infoRow}>
+        <View style={styles.infoBox}>
+          <Text style={styles.doctorName}>{doctor?.name}</Text>
+          <Text style={styles.doctorService}>{doctor?.service}</Text>
+        </View>
+        <View style={styles.ratingBox}>
+          <FontAwesome name="star" size={21} color="#FFD600" />
+          <Text style={styles.ratingValue}>{averageStars > 0 ? averageStars.toFixed(1) : '-'}</Text>
+          <Text style={styles.ratingReviews}>({reviewsCount} отзывов)</Text>
+        </View>
       </View>
-      <View style={styles.ratingBox}>
-        <FontAwesome name="star" size={21} color="#FFD600" />
-        <Text style={styles.ratingValue}>4.5</Text>
-        <Text style={styles.ratingReviews}>(76 отзывов)</Text>
+      <DoctorStats doctorId={Number(doctor?.id)} onReviewsCount={setReviewsCount} onAverageStars={setAverageStars} />
+      {/* Блок "Обо мне" */}
+      <View style={styles.aboutContainer}>
+        <Text style={styles.aboutTitle}>Обо мне</Text>
+        <Text style={styles.aboutText}>{doctor?.about || '—'}</Text>
       </View>
+      {/* Кнопка "Записаться" */}
+      <TouchableOpacity style={styles.button} onPress={onBook}>
+        <Text style={styles.buttonText}>Записаться</Text>
+      </TouchableOpacity>
     </View>
-    <DoctorStats doctorId={doctor?.id} />
-    {/* Блок "Обо мне" */}
-    <View style={styles.aboutContainer}>
-      <Text style={styles.aboutTitle}>Обо мне</Text>
-      <Text style={styles.aboutText}>{doctor?.about || '—'}</Text>
-    </View>
-    {/* Кнопка "Записаться" */}
-    <TouchableOpacity style={styles.button} onPress={onBook}>
-      <Text style={styles.buttonText}>Записаться</Text>
-    </TouchableOpacity>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   infoRow: {

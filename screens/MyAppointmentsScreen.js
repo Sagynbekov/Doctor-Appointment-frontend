@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import ReviewsModal from '../components/MyAppointmentsPage/ReviewsModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const DEFAULT_AVATAR = require('../assets/icon.png');
 const API_URL = 'http://192.168.0.105:8080'; // используем тот же адрес, что и на других страницах
@@ -13,12 +14,17 @@ const MyAppointmentsScreen = () => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
-  // TODO: заменить userId на реальный id авторизованного пользователя
-  const userId = 1;
-
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
+        // Получаем userId из AsyncStorage
+        const storedUserId = await AsyncStorage.getItem('userId');
+        if (!storedUserId) {
+          setAppointments([]);
+          setLoading(false);
+          return;
+        }
+        const userId = Number(storedUserId);
         const response = await fetch(`${API_URL}/api/books/appointments?userId=${userId}`);
         const data = await response.json();
         // Преобразуем данные для FlatList
@@ -29,6 +35,7 @@ const MyAppointmentsScreen = () => {
           date: item.date,
           time: item.time,
           avatar: item.photoUrl ? { uri: item.photoUrl } : DEFAULT_AVATAR,
+          doctorId: item.doctorId, // добавляем doctorId для отзыва
         }));
         setAppointments(formatted);
       } catch (e) {
@@ -55,11 +62,18 @@ const MyAppointmentsScreen = () => {
   const handleSubmitReview = async (reviewData) => {
     if (!selectedAppointment) return;
     try {
+      // Получаем userId из AsyncStorage
+      const storedUserId = await AsyncStorage.getItem('userId');
+      if (!storedUserId) {
+        alert('Ошибка: пользователь не найден');
+        return;
+      }
+      const userId = Number(storedUserId);
       const response = await fetch(`${API_URL}/api/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          doctorId: selectedAppointment.doctorId || selectedAppointment.id, // doctorId или id (если doctorId нет)
+          doctorId: selectedAppointment.doctorId, // теперь всегда корректный doctorId
           userId: userId,
           text: reviewData.review,
           stars: reviewData.rating,
