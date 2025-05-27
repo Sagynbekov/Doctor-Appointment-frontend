@@ -20,9 +20,7 @@ const DoctorInfo = ({ doctor, onBook }) => (
     {/* Блок "Обо мне" */}
     <View style={styles.aboutContainer}>
       <Text style={styles.aboutTitle}>Обо мне</Text>
-      <Text style={styles.aboutText}>
-        Опытный специалист с индивидуальным подходом к каждому пациенту. Всегда готов помочь и ответить на ваши вопросы.
-      </Text>
+      <Text style={styles.aboutText}>{doctor?.about || '—'}</Text>
     </View>
     {/* Кнопка "Записаться" */}
     <TouchableOpacity style={styles.button} onPress={onBook}>

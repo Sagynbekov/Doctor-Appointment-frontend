@@ -1,19 +1,17 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import HomeHeader from '../components/HomePage/HomeHeader';
 import Search from '../components/HomePage/Search';
 import Services from '../components/HomePage/HomeServices';
 import TopDoctors from '../components/HomePage/HomeTopDoctors';
 
 const HomeScreen = ({ username }) => (
-  <View style={styles.container}>
-    <View style={{ flex: 1 }}>
-      <HomeHeader username={username} />
-      <Search />
-      <Services />
-      <TopDoctors />
-    </View>
-  </View>
+  <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
+    <HomeHeader username={username} />
+    <Search />
+    <Services />
+    <TopDoctors />
+  </ScrollView>
 );
 
 const styles = StyleSheet.create({

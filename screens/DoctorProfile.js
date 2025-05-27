@@ -32,8 +32,8 @@ const DoctorProfile = () => {
             <FontAwesome name="heart-o" size={23} color="#FF3B30" />
           </TouchableOpacity>
         </View>
-        <DoctorInfo doctor={doctor} onBook={() => navigation.navigate('BookingScreen', { doctor })} />
       </View>
+      <DoctorInfo doctor={doctor} onBook={() => navigation.navigate('BookingScreen', { doctor })} />
     </View>
   );
 };
@@ -59,6 +59,7 @@ const styles = StyleSheet.create({
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 0,
   },
   headerTitle: {
     fontSize: 18,
@@ -69,7 +70,7 @@ const styles = StyleSheet.create({
   photoWrapper: {
     alignItems: 'center',
     marginTop: 12,
-    marginBottom: 24,
+    marginBottom: 0,
     width: '100%',
   },
   infoRow: {

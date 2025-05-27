@@ -8,22 +8,22 @@ const DoctorStats = () => (
       <View style={styles.iconCircle}>
         <FontAwesome name="check-square-o" size={24} color="#4F6CFF" />
       </View>
-      <Text style={styles.statValue}>3+</Text>
-      <Text style={styles.statLabel}>Years</Text>
+      <Text style={styles.statValue}>100+</Text>
+      <Text style={styles.statLabel}>Клиентов</Text>
     </View>
     <View style={styles.statBox}>
       <View style={styles.iconCircle}>
         <FontAwesome name="star" size={24} color="#4F6CFF" />
       </View>
       <Text style={styles.statValue}>4.9</Text>
-      <Text style={styles.statLabel}>Rating</Text>
+      <Text style={styles.statLabel}>Рейтинг</Text>
     </View>
     <View style={styles.statBox}>
       <View style={styles.iconCircle}>
         <FontAwesome name="commenting" size={24} color="#4F6CFF" />
       </View>
       <Text style={styles.statValue}>90+</Text>
-      <Text style={styles.statLabel}>Reviews</Text>
+      <Text style={styles.statLabel}>Отзывов</Text>
     </View>
   </View>
 );
