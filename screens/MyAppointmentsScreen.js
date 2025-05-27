@@ -1,28 +1,40 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const mockAppointments = [
-  {
-    id: '1',
-    doctor: 'Dr. Иван Иванов',
-    service: 'Стоматология',
-    date: '2025-05-28',
-    time: '09:00',
-    avatar: require('../assets/icon.png'),
-  },
-  {
-    id: '2',
-    doctor: 'Dr. Ольга Петрова',
-    service: 'Кардиология',
-    date: '2025-05-29',
-    time: '11:00',
-    avatar: require('../assets/icon.png'),
-  },
-];
+const DEFAULT_AVATAR = require('../assets/icon.png');
+const API_URL = 'http://192.168.0.105:8080'; // используем тот же адрес, что и на других страницах
 
 const MyAppointmentsScreen = () => {
-  const [appointments] = useState(mockAppointments);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // TODO: заменить userId на реальный id авторизованного пользователя
+  const userId = 1;
+
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/books/appointments?userId=${userId}`);
+        const data = await response.json();
+        // Преобразуем данные для FlatList
+        const formatted = data.map(item => ({
+          id: String(item.id),
+          doctor: item.doctorName,
+          service: item.service,
+          date: item.date,
+          time: item.time,
+          avatar: item.photoUrl ? { uri: item.photoUrl } : DEFAULT_AVATAR,
+        }));
+        setAppointments(formatted);
+      } catch (e) {
+        setAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
+  }, []);
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -39,7 +51,9 @@ const MyAppointmentsScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Мои записи</Text>
-      {appointments.length === 0 ? (
+      {loading ? (
+        <ActivityIndicator size="large" color="#4F6CFF" style={{ marginTop: 40 }} />
+      ) : appointments.length === 0 ? (
         <Text style={styles.empty}>У вас пока нет записей</Text>
       ) : (
         <FlatList
