@@ -12,6 +12,11 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
 
   const handleLogin = async () => {
     setError('');
+    // Хардкод для админа
+    if (username === 'Admin' && password === '123') {
+      onLoginSuccess('Admin', true); // второй аргумент - это isAdmin
+      return;
+    }
     try {
       const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
@@ -21,7 +26,7 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
         body: JSON.stringify({ username, password }),
       });
       if (response.ok) {
-        onLoginSuccess(username);
+        onLoginSuccess(username, false);
       } else {
         setError('Неверный логин или пароль');
       }

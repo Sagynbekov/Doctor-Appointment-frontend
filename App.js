@@ -9,9 +9,15 @@ import DoctorProfile from './screens/DoctorProfile';
 import BookingScreen from './screens/BookingScreen';
 import MyAppointmentsScreen from './screens/MyAppointmentsScreen';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import AdminScreen from './screens/AdminScreen';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import AdminSpecScreen from './screens/AdminSpecScreen';
+import AdminLogoutScreen from './screens/AdminLogoutScreen';
+import { Alert } from 'react-native';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
+const AdminTab = createBottomTabNavigator();
 
 function MainTabs({ username }) {
   return (
@@ -45,25 +51,79 @@ function MainTabs({ username }) {
   );
 }
 
+function AdminTabs({ onLogout }) {
+  const handleLogoutPress = () => {
+    Alert.alert(
+      'Выход',
+      'Вы уверены, что хотите выйти из админ панели?',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        { text: 'Выйти', style: 'destructive', onPress: onLogout },
+      ]
+    );
+  };
+  return (
+    <AdminTab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: { height: 60, paddingBottom: 6 },
+        tabBarIcon: ({ focused }) => {
+          if (route.name === 'AdminDoctors') {
+            return <FontAwesome name="user-md" size={28} color={focused ? '#3E69FE' : '#aaa'} />;
+          }
+          if (route.name === 'AdminSpecs') {
+            return <FontAwesome name="stethoscope" size={28} color={focused ? '#3E69FE' : '#aaa'} />;
+          }
+          if (route.name === 'AdminLogout') {
+            return <FontAwesome name="sign-out" size={28} color={focused ? '#FF3B30' : '#aaa'} />;
+          }
+        },
+      })}
+    >
+      <AdminTab.Screen name="AdminDoctors" component={AdminScreen} />
+      <AdminTab.Screen name="AdminSpecs" component={AdminSpecScreen} />
+      <AdminTab.Screen name="AdminLogout" component={AdminLogoutScreen} listeners={{
+        tabPress: e => {
+          e.preventDefault();
+          handleLogoutPress();
+        },
+      }} />
+    </AdminTab.Navigator>
+  );
+}
+
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {isLoggedIn ? (
-          <Stack.Screen name="MainTabs">
-            {() => <MainTabs username={username} />}
-          </Stack.Screen>
+          isAdmin ? (
+            <Stack.Screen name="AdminTabs">
+              {() => <AdminTabs onLogout={() => {
+                setIsLoggedIn(false);
+                setUsername('');
+                setIsAdmin(false);
+              }} />}
+            </Stack.Screen>
+          ) : (
+            <Stack.Screen name="MainTabs">
+              {() => <MainTabs username={username} />}
+            </Stack.Screen>
+          )
         ) : (
           <>
             <Stack.Screen name="Login">
               {({ navigation }) => (
                 <LoginScreen
-                  onLoginSuccess={(user) => {
+                  onLoginSuccess={(user, admin) => {
                     setUsername(user);
                     setIsLoggedIn(true);
+                    setIsAdmin(admin);
                   }}
                   navigation={navigation}
                 />
