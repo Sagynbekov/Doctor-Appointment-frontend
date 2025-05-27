@@ -1,18 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, ScrollView } from 'react-native';
 import HomeHeader from '../components/HomePage/HomeHeader';
 import Search from '../components/HomePage/Search';
 import Services from '../components/HomePage/HomeServices';
 import TopDoctors from '../components/HomePage/HomeTopDoctors';
 
-const HomeScreen = ({ username }) => (
-  <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
-    <HomeHeader username={username} />
-    <Search />
-    <Services />
-    <TopDoctors />
-  </ScrollView>
-);
+const HomeScreen = ({ username }) => {
+  const [selectedService, setSelectedService] = useState(null);
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
+      <HomeHeader username={username} />
+      <Search />
+      <Services selectedService={selectedService} setSelectedService={setSelectedService} />
+      <TopDoctors selectedService={selectedService} />
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {

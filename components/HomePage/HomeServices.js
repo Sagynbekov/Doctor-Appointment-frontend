@@ -3,24 +3,36 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
-const Services = () => (
+const Services = ({ selectedService, setSelectedService }) => (
   <>
     <View style={styles.servicesHeader}>
       <Text style={styles.servicesTitle}>Сервисы</Text>
     </View>
     <View style={styles.servicesRow}>
-      <View style={styles.serviceBox}>
+      <TouchableOpacity
+        style={[styles.serviceBox, selectedService === 'Стоматолог' && styles.selectedBox]}
+        onPress={() => setSelectedService(selectedService === 'Стоматолог' ? null : 'Стоматолог')}
+        activeOpacity={0.8}
+      >
         <MaterialCommunityIcons name="tooth-outline" size={32} color="#fff" />
         <Text style={styles.serviceText}>Стоматология</Text>
-      </View>
-      <View style={styles.serviceBox}>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.serviceBox, selectedService === 'Невролог' && styles.selectedBox]}
+        onPress={() => setSelectedService(selectedService === 'Невролог' ? null : 'Невролог')}
+        activeOpacity={0.8}
+      >
         <MaterialCommunityIcons name="brain" size={32} color="#fff" />
         <Text style={styles.serviceText}>Неврология</Text>
-      </View>
-      <View style={styles.serviceBox}>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.serviceBox, selectedService === 'Кардиолог' && styles.selectedBox]}
+        onPress={() => setSelectedService(selectedService === 'Кардиолог' ? null : 'Кардиолог')}
+        activeOpacity={0.8}
+      >
         <FontAwesome name="heartbeat" size={32} color="#fff" />
         <Text style={styles.serviceText}>Кардиология</Text>
-      </View>
+      </TouchableOpacity>
     </View>
   </>
 );
@@ -75,6 +87,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
     marginTop: 8,
+  },
+  selectedBox: {
+    borderWidth: 3,
+    borderColor: '#FFD600',
+    backgroundColor: '#2d4fd3',
   },
 });
 

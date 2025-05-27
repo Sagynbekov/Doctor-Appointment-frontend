@@ -5,7 +5,7 @@ import DoctorCard from './HomeDoctorCards';
 
 const API_URL = 'http://192.168.0.105:8080';
 
-const TopDoctors = () => {
+const TopDoctors = ({ selectedService }) => {
   const navigation = useNavigation();
   const [doctors, setDoctors] = useState([]);
   const [ratings, setRatings] = useState({}); // { [doctorId]: avgRating }
@@ -38,10 +38,15 @@ const TopDoctors = () => {
       .catch(() => setDoctors([]));
   }, []);
 
+  // Фильтрация по сервису
+  const filteredDoctors = selectedService
+    ? doctors.filter(doc => doc.service === selectedService)
+    : doctors;
+
   return (
     <>
       <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#222', marginBottom: 24 }}>Лучшие Доктора</Text>
-      {doctors.map((doctor, idx) => (
+      {filteredDoctors.map((doctor, idx) => (
         <DoctorCard
           doctor={{
             name: doctor.name,
