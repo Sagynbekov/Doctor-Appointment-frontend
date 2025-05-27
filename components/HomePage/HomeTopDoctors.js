@@ -5,7 +5,7 @@ import DoctorCard from './HomeDoctorCards';
 
 const API_URL = 'http://192.168.0.105:8080';
 
-const TopDoctors = ({ selectedService }) => {
+const TopDoctors = ({ selectedService, searchQuery }) => {
   const navigation = useNavigation();
   const [doctors, setDoctors] = useState([]);
   const [ratings, setRatings] = useState({}); // { [doctorId]: avgRating }
@@ -38,10 +38,14 @@ const TopDoctors = ({ selectedService }) => {
       .catch(() => setDoctors([]));
   }, []);
 
-  // Фильтрация по сервису
-  const filteredDoctors = selectedService
-    ? doctors.filter(doc => doc.service === selectedService)
-    : doctors;
+  // Фильтрация по сервису и поиску
+  const filteredDoctors = doctors.filter(doc => {
+    const matchesService = selectedService ? doc.service === selectedService : true;
+    const matchesSearch = searchQuery
+      ? doc.name && doc.name.toLowerCase().startsWith(searchQuery.toLowerCase())
+      : true;
+    return matchesService && matchesSearch;
+  });
 
   return (
     <>

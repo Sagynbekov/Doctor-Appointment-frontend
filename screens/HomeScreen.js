@@ -7,13 +7,14 @@ import TopDoctors from '../components/HomePage/HomeTopDoctors';
 
 const HomeScreen = ({ username }) => {
   const [selectedService, setSelectedService] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ flexGrow: 1, paddingBottom: 100 }}>
       <HomeHeader username={username} />
-      <Search />
+      <Search value={searchQuery} onChangeText={setSearchQuery} />
       <Services selectedService={selectedService} setSelectedService={setSelectedService} />
-      <TopDoctors selectedService={selectedService} />
+      <TopDoctors selectedService={selectedService} searchQuery={searchQuery} />
     </ScrollView>
   );
 };

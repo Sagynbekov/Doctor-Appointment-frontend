@@ -2,11 +2,18 @@ import React from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-const Search = () => (
+const Search = ({ value, onChangeText }) => (
   <View style={styles.searchRow}>
     <View style={styles.searchInputWrapper}>
       <Icon name="search" size={20} color="#aaa" style={{ marginLeft: 8 }} />
-      <TextInput style={styles.searchInput} placeholder="Поиск" />
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Поиск"
+        value={value}
+        onChangeText={onChangeText}
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
     </View>
     <TouchableOpacity style={styles.filterButton}>
       <Icon name="tune" size={24} color="#3E69FE" />
