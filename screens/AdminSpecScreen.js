@@ -18,35 +18,59 @@ const AdminSpecScreen = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [service, setService] = useState('');
+  const [editId, setEditId] = useState(null);
+
+  const fetchSpecs = async () => {
+    try {
+      const res = await fetch(`${API_URL}/specializations`);
+      const data = await res.json();
+      setSpecs(data);
+    } catch {
+      setSpecs([]);
+    }
+  };
 
   useEffect(() => {
-    fetch(`${API_URL}/specializations`)
-      .then(res => res.json())
-      .then(data => setSpecs(data))
-      .catch(() => setSpecs([]));
+    fetchSpecs();
   }, []);
 
-  const handleAddSpec = async () => {
+  const handleAddOrEditSpec = async () => {
     if (!service || !name || !description) {
       Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/specializations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, service }),
-      });
-      if (response.ok) {
-        // После успешного добавления — обновить список с сервера (ждём ответа)
-        const res = await fetch(`${API_URL}/specializations`);
-        const data = await res.json();
-        setSpecs(data);
-        setName('');
-        setDescription('');
-        setService('');
+      if (editId) {
+        // Редактирование
+        const response = await fetch(`${API_URL}/specializations/${editId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description, service }),
+        });
+        if (response.ok) {
+          await fetchSpecs();
+          setEditId(null);
+          setName('');
+          setDescription('');
+          setService('');
+        } else {
+          Alert.alert('Ошибка', 'Не удалось обновить специализацию');
+        }
       } else {
-        Alert.alert('Ошибка', 'Не удалось добавить специализацию');
+        // Добавление
+        const response = await fetch(`${API_URL}/specializations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description, service }),
+        });
+        if (response.ok) {
+          await fetchSpecs();
+          setName('');
+          setDescription('');
+          setService('');
+        } else {
+          Alert.alert('Ошибка', 'Не удалось добавить специализацию');
+        }
       }
     } catch {
       Alert.alert('Ошибка', 'Ошибка соединения с сервером');
@@ -54,11 +78,34 @@ const AdminSpecScreen = () => {
   };
 
   const handleDeleteSpec = (id) => {
-    setSpecs(specs.filter(s => s.id !== id));
+    Alert.alert(
+      'Удаление',
+      'Вы точно хотите удалить специализацию?',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        {
+          text: 'Удалить', style: 'destructive', onPress: async () => {
+            try {
+              const response = await fetch(`${API_URL}/specializations/${id}`, { method: 'DELETE' });
+              if (response.ok || response.status === 204) {
+                await fetchSpecs();
+              } else {
+                Alert.alert('Ошибка', 'Не удалось удалить специализацию');
+              }
+            } catch {
+              Alert.alert('Ошибка', 'Ошибка соединения с сервером');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handleEditSpec = (spec) => {
-    Alert.alert('Редактировать', `Редактировать специализацию: ${spec.name}`);
+    setEditId(spec.id);
+    setName(spec.name);
+    setDescription(spec.description);
+    setService(spec.service);
   };
 
   const renderSpec = ({ item }) => (
@@ -106,7 +153,10 @@ const AdminSpecScreen = () => {
               multiline
               numberOfLines={3}
             />
-            <CustomButton title="Добавить специализацию" onPress={handleAddSpec} />
+            <CustomButton title={editId ? 'Сохранить изменения' : 'Добавить специализацию'} onPress={handleAddOrEditSpec} />
+            {editId && (
+              <CustomButton title="Отмена редактирования" onPress={() => { setEditId(null); setName(''); setDescription(''); setService(''); }} style={{ marginTop: 8, backgroundColor: '#ccc' }} />
+            )}
             <Text style={styles.sectionTitle}>Список специализаций</Text>
           </>
         }

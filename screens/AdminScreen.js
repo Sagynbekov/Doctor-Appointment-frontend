@@ -26,12 +26,20 @@ const AdminScreen = () => {
   const [specializations, setSpecializations] = useState([]);
   const [selectedSpecId, setSelectedSpecId] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
+  const [editId, setEditId] = useState(null);
+
+  const fetchDoctors = async () => {
+    try {
+      const res = await fetch(`${API_URL}/doctors`);
+      const data = await res.json();
+      setDoctors(data);
+    } catch {
+      setDoctors([]);
+    }
+  };
 
   useEffect(() => {
-    fetch(`${API_URL}/doctors`)
-      .then(res => res.json())
-      .then(data => setDoctors(data))
-      .catch(() => setDoctors([]));
+    fetchDoctors();
   }, []);
 
   useEffect(() => {
@@ -69,38 +77,65 @@ const AdminScreen = () => {
     }
   };
 
-  const handleAddDoctor = async () => {
+  const handleAddOrEditDoctor = async () => {
     if (!name || !selectedSpecId || !price || !about || !service) {
       Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
     try {
-      const response = await fetch(`${API_URL}/doctors`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          service,
-          specialization: { id: Number(selectedSpecId) },
-          price: price.endsWith('₸') ? price : price + '₸',
-          about,
-          photoUrl,
-        }),
-      });
-      if (response.ok) {
-        // После успешного добавления доктора обновляем список с сервера
-        fetch(`${API_URL}/doctors`)
-          .then(res => res.json())
-          .then(data => setDoctors(data));
-        setName('');
-        setSelectedSpecId('');
-        setPrice('');
-        setAbout('');
-        setPhotoUrl('');
-        setAvatar(defaultAvatar);
-        setService('');
+      if (editId) {
+        // Редактирование
+        const response = await fetch(`${API_URL}/doctors/${editId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            service,
+            specialization: { id: Number(selectedSpecId) },
+            price: price.endsWith('₸') ? price : price + '₸',
+            about,
+            photoUrl,
+          }),
+        });
+        if (response.ok) {
+          await fetchDoctors();
+          setEditId(null);
+          setName('');
+          setSelectedSpecId('');
+          setPrice('');
+          setAbout('');
+          setPhotoUrl('');
+          setAvatar(defaultAvatar);
+          setService('');
+        } else {
+          Alert.alert('Ошибка', 'Не удалось обновить доктора');
+        }
       } else {
-        Alert.alert('Ошибка', 'Не удалось добавить доктора');
+        // Добавление
+        const response = await fetch(`${API_URL}/doctors`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            service,
+            specialization: { id: Number(selectedSpecId) },
+            price: price.endsWith('₸') ? price : price + '₸',
+            about,
+            photoUrl,
+          }),
+        });
+        if (response.ok) {
+          await fetchDoctors();
+          setName('');
+          setSelectedSpecId('');
+          setPrice('');
+          setAbout('');
+          setPhotoUrl('');
+          setAvatar(defaultAvatar);
+          setService('');
+        } else {
+          Alert.alert('Ошибка', 'Не удалось добавить доктора');
+        }
       }
     } catch {
       Alert.alert('Ошибка', 'Ошибка соединения с сервером');
@@ -108,12 +143,38 @@ const AdminScreen = () => {
   };
 
   const handleDeleteDoctor = (id) => {
-    setDoctors(doctors.filter(doc => doc.id !== id));
+    Alert.alert(
+      'Удаление',
+      'Вы точно хотите удалить доктора?',
+      [
+        { text: 'Отмена', style: 'cancel' },
+        {
+          text: 'Удалить', style: 'destructive', onPress: async () => {
+            try {
+              const response = await fetch(`${API_URL}/doctors/${id}`, { method: 'DELETE' });
+              if (response.ok || response.status === 204) {
+                await fetchDoctors();
+              } else {
+                Alert.alert('Ошибка', 'Не удалось удалить доктора');
+              }
+            } catch {
+              Alert.alert('Ошибка', 'Ошибка соединения с сервером');
+            }
+          }
+        }
+      ]
+    );
   };
 
   const handleEditDoctor = (doctor) => {
-    // Здесь можно реализовать открытие модального окна для редактирования
-    Alert.alert('Редактировать', `Редактировать доктора: ${doctor.name}`);
+    setEditId(doctor.id);
+    setName(doctor.name);
+    setService(doctor.service);
+    setSelectedSpecId(doctor.specialization?.id?.toString() || '');
+    setPrice(doctor.price ? doctor.price.replace(/₸$/, '') : '');
+    setAbout(doctor.about);
+    setPhotoUrl(doctor.photoUrl || '');
+    setAvatar(doctor.photoUrl ? { uri: doctor.photoUrl } : defaultAvatar);
   };
 
   const renderDoctor = ({ item }) => (
@@ -190,7 +251,10 @@ const AdminScreen = () => {
                 <Image source={{ uri: photoUrl }} style={{ width: 80, height: 80, borderRadius: 40, marginTop: 8 }} />
               ) : null}
             </View>
-            <CustomButton title="Добавить доктора" onPress={handleAddDoctor} />
+            <CustomButton title={editId ? 'Сохранить изменения' : 'Добавить доктора'} onPress={handleAddOrEditDoctor} />
+            {editId && (
+              <CustomButton title="Отмена редактирования" onPress={() => { setEditId(null); setName(''); setSelectedSpecId(''); setPrice(''); setAbout(''); setPhotoUrl(''); setAvatar(defaultAvatar); setService(''); }} style={{ marginTop: 8, backgroundColor: '#ccc' }} />
+            )}
             <Text style={styles.sectionTitle}>Список докторов</Text>
           </>
         }
