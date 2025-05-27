@@ -35,7 +35,12 @@ function MainTabs({ username }) {
       </Tab.Screen>
       <Tab.Screen name="AppointmentsTab" component={MyAppointmentsScreen} />
       <Tab.Screen name="FavoritesTab" component={require('./screens/FavoritsScreen').default} />
-      <Tab.Screen name="ProfileTab" component={require('./screens/MyProfileScreen').default} />
+      <Tab.Screen name="ProfileTab">
+        {() => {
+          const ProfileScreen = require('./screens/MyProfileScreen').default;
+          return <ProfileScreen username={username} />;
+        }}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
