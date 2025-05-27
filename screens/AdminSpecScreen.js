@@ -3,13 +3,21 @@ import { View, Text, StyleSheet, FlatList, TextInput, Alert, TouchableOpacity } 
 import CustomButton from '../components/CustomButton';
 import InputField from '../components/InputField';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Picker } from '@react-native-picker/picker';
 
 const API_URL = 'http://192.168.0.105:8080';
+
+const SERVICE_OPTIONS = [
+  { label: 'Стоматолог', value: 'Стоматолог' },
+  { label: 'Невролог', value: 'Невролог' },
+  { label: 'Кардиолог', value: 'Кардиолог' },
+];
 
 const AdminSpecScreen = () => {
   const [specs, setSpecs] = useState([]);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [service, setService] = useState('');
 
   useEffect(() => {
     fetch(`${API_URL}/specializations`)
@@ -19,7 +27,7 @@ const AdminSpecScreen = () => {
   }, []);
 
   const handleAddSpec = async () => {
-    if (!name || !description) {
+    if (!service || !name || !description) {
       Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
@@ -27,13 +35,16 @@ const AdminSpecScreen = () => {
       const response = await fetch(`${API_URL}/specializations`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description }),
+        body: JSON.stringify({ name, description, service }),
       });
       if (response.ok) {
-        const newSpec = await response.json();
-        setSpecs([...specs, newSpec]);
+        // После успешного добавления — обновить список с сервера (ждём ответа)
+        const res = await fetch(`${API_URL}/specializations`);
+        const data = await res.json();
+        setSpecs(data);
         setName('');
         setDescription('');
+        setService('');
       } else {
         Alert.alert('Ошибка', 'Не удалось добавить специализацию');
       }
@@ -53,6 +64,7 @@ const AdminSpecScreen = () => {
   const renderSpec = ({ item }) => (
     <View style={styles.card}>
       <View style={{ flex: 1 }}>
+        <Text style={{ color: '#222', fontWeight: 'bold', fontSize: 15, marginBottom: 2 }}>{item.service || ''}</Text>
         <Text style={styles.specName}>{item.name}</Text>
         <Text style={styles.specDesc}>{item.description}</Text>
         <View style={styles.iconRow}>
@@ -73,6 +85,18 @@ const AdminSpecScreen = () => {
         ListHeaderComponent={
           <>
             <Text style={styles.title}>Добавить специализацию</Text>
+            <View style={{ marginVertical: 8, backgroundColor: '#f9f9f9', borderRadius: 8, borderWidth: 1, borderColor: '#ccc' }}>
+              <Picker
+                selectedValue={service}
+                onValueChange={value => setService(value)}
+                style={{ height: 50, width: '100%' }}
+              >
+                <Picker.Item label="Выберите сервис" value="" />
+                {SERVICE_OPTIONS.map(opt => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+            </View>
             <InputField placeholder="Название специализации" value={name} onChangeText={setName} />
             <TextInput
               style={styles.textArea}

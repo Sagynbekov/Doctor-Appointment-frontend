@@ -23,14 +23,16 @@ const TopDoctors = () => {
         <DoctorCard
           doctor={{
             name: doctor.name,
-            service: doctor.specialization?.name || '',
+            service: doctor.service || '',
+            specialization: doctor.specialization?.name || '',
             price: `Цена: ${doctor.price}`,
             avatar: doctor.photoUrl ? { uri: doctor.photoUrl } : require('../../assets/icon.png'),
           }}
           key={doctor.id || idx}
           onPress={() => navigation.navigate('DoctorProfile', { doctor: {
             ...doctor,
-            service: doctor.specialization?.name || '',
+            service: doctor.service || '',
+            specialization: doctor.specialization?.name || '',
             avatar: doctor.photoUrl ? { uri: doctor.photoUrl } : require('../../assets/icon.png'),
           } })}
         />

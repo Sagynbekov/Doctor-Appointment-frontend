@@ -13,6 +13,7 @@ const DoctorCard = ({ doctor, style, onPress }) => (
     <View style={{ flex: 1 }}>
       <Text style={styles.doctorName}>{doctor.name}</Text>
       <Text style={styles.doctorService}>{doctor.service}</Text>
+      <Text style={styles.doctorService}>{doctor.specialization}</Text>
       <Text style={styles.doctorPrice}>{doctor.price}</Text>
       <TouchableOpacity style={styles.arrowButton} onPress={onPress}>
         <Feather name="arrow-right" size={20} color="#fff" />

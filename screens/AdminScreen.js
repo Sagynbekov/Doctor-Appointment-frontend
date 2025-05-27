@@ -5,9 +5,16 @@ import InputField from '../components/InputField';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker';
+import { useFocusEffect } from '@react-navigation/native';
 
 const defaultAvatar = require('../assets/icon.png');
 const API_URL = 'http://192.168.0.105:8080';
+
+const SERVICE_OPTIONS = [
+  { label: 'Стоматолог', value: 'Стоматолог' },
+  { label: 'Невролог', value: 'Невролог' },
+  { label: 'Кардиолог', value: 'Кардиолог' },
+];
 
 const AdminScreen = () => {
   const [doctors, setDoctors] = useState([]);
@@ -34,6 +41,15 @@ const AdminScreen = () => {
       .catch(() => setSpecializations([]));
   }, []);
 
+  useFocusEffect(
+    React.useCallback(() => {
+      fetch(`${API_URL}/specializations`)
+        .then(res => res.json())
+        .then(data => setSpecializations(data))
+        .catch(() => setSpecializations([]));
+    }, [])
+  );
+
   const handlePickImage = async () => {
     // Запросить разрешение на доступ к галерее
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -54,7 +70,7 @@ const AdminScreen = () => {
   };
 
   const handleAddDoctor = async () => {
-    if (!name || !selectedSpecId || !price || !about) {
+    if (!name || !selectedSpecId || !price || !about || !service) {
       Alert.alert('Ошибка', 'Пожалуйста, заполните все поля');
       return;
     }
@@ -64,6 +80,7 @@ const AdminScreen = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
+          service,
           specialization: { id: Number(selectedSpecId) },
           price: price.endsWith('₸') ? price : price + '₸',
           about,
@@ -81,6 +98,7 @@ const AdminScreen = () => {
         setAbout('');
         setPhotoUrl('');
         setAvatar(defaultAvatar);
+        setService('');
       } else {
         Alert.alert('Ошибка', 'Не удалось добавить доктора');
       }
@@ -103,6 +121,7 @@ const AdminScreen = () => {
       <Image source={item.photoUrl ? { uri: item.photoUrl } : defaultAvatar} style={styles.avatar} />
       <View style={{ flex: 1 }}>
         <Text style={styles.doctorName}>{item.name}</Text>
+        <Text style={styles.doctorService}>{item.service || ''}</Text>
         <Text style={styles.doctorService}>{item.specialization?.name || ''}</Text>
         <Text style={styles.doctorPrice}>Цена: {item.price}</Text>
         <View style={styles.iconRow}>
@@ -128,6 +147,18 @@ const AdminScreen = () => {
             <Text style={styles.title}>Панель Администратора</Text>
             <Text style={styles.sectionTitle}>Добавить нового доктора</Text>
             <InputField placeholder="Имя доктора" value={name} onChangeText={setName} />
+            <View style={{ marginVertical: 8, backgroundColor: '#f9f9f9', borderRadius: 8, borderWidth: 1, borderColor: '#ccc' }}>
+              <Picker
+                selectedValue={service}
+                onValueChange={value => setService(value)}
+                style={{ height: 50, width: '100%' }}
+              >
+                <Picker.Item label="Выберите сервис" value="" />
+                {SERVICE_OPTIONS.map(opt => (
+                  <Picker.Item key={opt.value} label={opt.label} value={opt.value} />
+                ))}
+              </Picker>
+            </View>
             <View style={{ marginVertical: 8, backgroundColor: '#f9f9f9', borderRadius: 8, borderWidth: 1, borderColor: '#ccc' }}>
               <Picker
                 selectedValue={selectedSpecId}
