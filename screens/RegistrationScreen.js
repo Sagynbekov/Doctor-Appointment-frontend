@@ -12,7 +12,7 @@ const RegistrationScreen = ({ navigation }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const API_URL = 'http://192.168.0.105:8080';
+  const API_URL = 'http://192.168.0.101:8080'; // ИЗМЕНЕН ПОРТ НА 8080
 
   const handleRegister = async () => {
     setError('');
@@ -26,11 +26,11 @@ const RegistrationScreen = ({ navigation }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          fullName,
-          phone,
-          birthYear,
           username,
           password,
+          fullName,
+          phone,
+          birthYear: Number(birthYear),
         }),
       });
       if (response.ok) {

@@ -36,20 +36,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    width: '85%',
+    paddingHorizontal: 30,
     marginTop: 15,
-    paddingLeft: 8,
-    paddingRight: 8,
   },
   infoBox: {
     alignItems: 'flex-start',
     flex: 1,
+    marginRight: 26,
   },
   doctorName: {
     fontWeight: 'bold',
     fontSize: 18,
     color: '#222',
     textAlign: 'left',
+
   },
   doctorService: {
     color: '#888',
@@ -61,6 +61,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginTop: 2,
+    flexShrink: 0,
+    minWidth: 80,
   },
   ratingValue: {
     color: '#222',
@@ -72,6 +74,7 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 13,
     marginLeft: 6,
+    paddingTop: 2
   },
   aboutContainer: {
     marginTop: 5,
@@ -81,12 +84,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
     color: '#222',
+    paddingLeft: 10,
     marginBottom: 4,
   },
   aboutText: {
     color: '#444',
     fontSize: 14,
     lineHeight: 20,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   button: {
     marginTop: 22,

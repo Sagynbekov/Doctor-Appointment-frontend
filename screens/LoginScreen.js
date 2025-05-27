@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import InputField from '../components/InputField';
 import CustomButton from '../components/CustomButton';
 
@@ -7,10 +7,8 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [regError, setRegError] = useState('');
-  const [regSuccess, setRegSuccess] = useState('');
 
-  const API_URL = 'http://192.168.0.105:8080'; // IP вашего ПК в локальной сети
+  const API_URL = 'http://192.168.0.101:8080'; // IP вашего ПК в локальной сети, ИЗМЕНЕН ПОРТ НА 8080
 
   const handleLogin = async () => {
     setError('');
@@ -32,31 +30,6 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
     }
   };
 
-  const handleRegister = async () => {
-    setRegError('');
-    setRegSuccess('');
-    if (!username || !password) {
-      setRegError('Введите логин и пароль');
-      return;
-    }
-    try {
-      const response = await fetch(`${API_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      if (response.ok) {
-        setRegSuccess('Регистрация успешна! Теперь войдите.');
-      } else if (response.status === 409) {
-        setRegError('Пользователь с таким логином уже существует');
-      } else {
-        setRegError('Ошибка регистрации');
-      }
-    } catch (e) {
-      setRegError('Ошибка соединения с сервером');
-    }
-  };
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Вход в систему</Text>
@@ -72,8 +45,6 @@ const LoginScreen = ({ onLoginSuccess, navigation }) => {
         secureTextEntry
       />
       {error ? <Text style={styles.error}>{error}</Text> : null}
-      {regError ? <Text style={styles.error}>{regError}</Text> : null}
-      {regSuccess ? <Text style={styles.success}>{regSuccess}</Text> : null}
       <CustomButton title="Войти" onPress={handleLogin} />
       <CustomButton
         title="Зарегистрироваться"
