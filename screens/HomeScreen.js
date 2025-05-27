@@ -4,7 +4,6 @@ import HomeHeader from '../components/HomePage/HomeHeader';
 import Search from '../components/HomePage/Search';
 import Services from '../components/HomePage/HomeServices';
 import TopDoctors from '../components/HomePage/HomeTopDoctors';
-import Footer from '../components/HomePage/HomeFooter';
 
 const HomeScreen = ({ username }) => (
   <View style={styles.container}>
@@ -14,7 +13,6 @@ const HomeScreen = ({ username }) => (
       <Services />
       <TopDoctors />
     </View>
-    <Footer />
   </View>
 );
 
